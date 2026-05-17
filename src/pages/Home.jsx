@@ -1,49 +1,55 @@
 import { Link } from 'react-router-dom'
-import { Play, ChevronRight } from 'lucide-react'
+import { ChevronRight, Volume2, VolumeX } from 'lucide-react'
+import { useState, useRef } from 'react'
 import { products, categories } from '../data/products'
 import { useCart } from '../context/CartContext'
 
-function AquariumHero() {
+function HeroVideo() {
+  const [muted, setMuted] = useState(true)
+  const videoRef = useRef(null)
+
+  const toggleMute = () => {
+    setMuted(m => {
+      if (videoRef.current) videoRef.current.muted = !m
+      return !m
+    })
+  }
+
   return (
-    <div className="relative w-full max-w-sm mx-auto float-anim">
-      <div className="absolute inset-0 rounded-full bg-mist-blue opacity-20 blur-3xl scale-110" />
-      <div className="relative bg-gradient-to-b from-soft-ice via-white to-mist-blue rounded-[40%_40%_50%_50%/30%_30%_50%_50%] aspect-[4/3] border border-mist-blue/40 overflow-hidden shadow-xl">
-        <div className="absolute bottom-0 left-0 right-0 h-3/4 bg-gradient-to-b from-transparent via-mist-blue/20 to-mist-blue/50" />
-        <div className="absolute bottom-6 left-6 w-12 h-20 opacity-60">
-          <div className="relative">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute bottom-0 bg-gradient-to-t from-green-700 to-green-400 rounded-full"
-                style={{ width: `${5 + i * 2}px`, height: `${24 + i * 12}px`, left: `${i * 8}px`, transform: `rotate(${-10 + i * 5}deg)`, transformOrigin: 'bottom' }}
-              />
-            ))}
-          </div>
+    <div className="relative w-full max-w-sm mx-auto">
+      {/* Soft glow behind */}
+      <div className="absolute inset-4 bg-mist-blue opacity-30 blur-3xl rounded-full" />
+
+      {/* Video container — aquarium-shaped rounded rect */}
+      <div className="relative overflow-hidden rounded-3xl shadow-2xl border border-mist-blue/30 aspect-[4/5]">
+        <video
+          ref={videoRef}
+          src="/hero-betta.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        />
+        {/* Subtle overlay to blend with brand palette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-navy/20 via-transparent to-transparent pointer-events-none" />
+
+        {/* Mute toggle */}
+        <button
+          onClick={toggleMute}
+          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors"
+        >
+          {muted ? <VolumeX size={13} strokeWidth={1.5} /> : <Volume2 size={13} strokeWidth={1.5} />}
+        </button>
+
+        {/* Brand watermark */}
+        <div className="absolute top-3 left-3">
+          <span className="font-montserrat text-[9px] tracking-widest text-white/60" style={{ letterSpacing: '0.2em' }}>TINY AQUA</span>
         </div>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-          <div className="flex gap-1 items-end">
-            <div className="w-8 h-6 bg-gray-300 rounded-t-full opacity-70" />
-            <div className="w-11 h-9 bg-gray-400 rounded-t-full opacity-80" />
-            <div className="w-6 h-5 bg-gray-300 rounded-t-full opacity-60" />
-          </div>
-        </div>
-        <div className="absolute bottom-6 right-5 w-10 h-16 opacity-50">
-          <div className="relative">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute bottom-0 bg-gradient-to-t from-green-600 to-emerald-300 rounded-full"
-                style={{ width: `${4 + i}px`, height: `${16 + i * 10}px`, right: `${i * 6}px`, transform: `rotate(${5 - i * 3}deg)`, transformOrigin: 'bottom' }}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-16 bg-gradient-to-b from-white to-transparent opacity-40" />
-        {[15, 45, 70].map((left, i) => (
-          <div key={i} className="absolute w-1.5 h-1.5 rounded-full border border-white/60" style={{ left: `${left}%`, bottom: `${25 + i * 14}%`, animation: `float ${2 + i * 0.5}s ease-in-out infinite`, animationDelay: `${i * 0.3}s` }} />
-        ))}
       </div>
-      <div className="relative mt-3 mx-8 h-8 bg-gradient-to-b from-mist-blue/30 to-transparent rounded-b-full blur-sm" />
+
+      {/* Water reflection */}
+      <div className="relative mt-3 mx-6 h-6 bg-gradient-to-b from-mist-blue/25 to-transparent rounded-b-full blur-sm" />
     </div>
   )
 }
@@ -160,14 +166,8 @@ export default function Home() {
             </div>
 
             {/* Right */}
-            <div className="order-1 lg:order-2 relative">
-              <AquariumHero />
-              <button className="absolute bottom-2 right-2 flex items-center gap-2 group">
-                <div className="w-7 h-7 rounded-full border border-navy flex items-center justify-center group-hover:bg-navy transition-colors">
-                  <Play size={9} fill="currentColor" className="text-navy group-hover:text-white" />
-                </div>
-                <span className="font-montserrat text-[8px] tracking-widest text-navy hidden sm:block" style={{ letterSpacing: '0.2em' }}>WATCH THE CALM</span>
-              </button>
+            <div className="order-1 lg:order-2">
+              <HeroVideo />
             </div>
 
           </div>
