@@ -1,0 +1,257 @@
+import { useState } from 'react'
+import { Check } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
+const plans = [
+  {
+    id: 'essential',
+    name: 'Essential Care',
+    price: 29,
+    popular: false,
+    tagline: 'Basic maintenance for healthy ecosystems.',
+    features: [
+      'Water change (bi/month)',
+      'Plant trimming',
+      'Water testing',
+      'Online support',
+    ],
+  },
+  {
+    id: 'nature',
+    name: 'Nature Care',
+    price: 59,
+    popular: true,
+    tagline: 'Complete care for thriving aquascapes.',
+    features: [
+      'Water change (4x/month)',
+      'Plant trimming',
+      'Water testing',
+      'CO2 refill',
+      'Fertilisation',
+      'Priority support',
+    ],
+  },
+  {
+    id: 'elite',
+    name: 'Elite Ecosystem',
+    price: 99,
+    popular: false,
+    tagline: 'Premium care for elite ecosystems.',
+    features: [
+      'Unlimited maintenance',
+      'CO2 & fertilizer included',
+      'Emergency support',
+      'Monthly ecosystem check',
+      'Personal aquascaper',
+    ],
+  },
+]
+
+const faqs = [
+  {
+    q: 'How does the subscription work?',
+    a: 'After subscribing, our team contacts you within 48 hours to schedule your first maintenance visit. We handle everything — you just enjoy the view.',
+  },
+  {
+    q: 'Can I cancel at any time?',
+    a: 'Yes, absolutely. No long-term contracts. Cancel or pause any time from your account dashboard.',
+  },
+  {
+    q: 'What areas do you service?',
+    a: 'We currently service major metro areas. Enter your postcode at checkout to confirm availability.',
+  },
+  {
+    q: 'Do I need to be home during maintenance?',
+    a: 'Not necessarily. Many clients provide access. Discuss your preference with your assigned aquascaper.',
+  },
+]
+
+function FaqItem({ q, a }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border-b border-gray-100">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-5 text-left"
+      >
+        <span className="font-montserrat font-medium text-sm text-navy" style={{ letterSpacing: '0.05em' }}>{q}</span>
+        <span className={`text-navy transition-transform ${open ? 'rotate-45' : ''} text-xl leading-none ml-4`}>+</span>
+      </button>
+      {open && (
+        <p className="font-inter text-sm text-gray-500 leading-relaxed pb-5">{a}</p>
+      )}
+    </div>
+  )
+}
+
+export default function Subscription() {
+  const [billing, setBilling] = useState('monthly')
+
+  return (
+    <div className="min-h-screen pt-20 bg-white">
+
+      {/* Hero */}
+      <section className="bg-soft-ice py-20 px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="section-label mb-4">AQUACARE SUBSCRIPTION</p>
+              <h1 className="font-montserrat font-light text-4xl lg:text-5xl text-navy leading-tight mb-6" style={{ letterSpacing: '0.05em' }}>
+                WE TAKE CARE<br />OF YOUR<br />ECOSYSTEM
+              </h1>
+              <p className="font-inter text-gray-500 text-sm leading-relaxed mb-8 max-w-sm">
+                We take care of your ecosystem, so you can enjoy the peace. Professional aquacare starting at $29/month.
+              </p>
+              <ul className="space-y-3 mb-10">
+                {['Professional maintenance', 'Healthy plants & fish', 'Crystal clear water', 'Priority support'].map(f => (
+                  <li key={f} className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full border border-navy flex items-center justify-center">
+                      <Check size={9} strokeWidth={2} className="text-navy" />
+                    </div>
+                    <span className="font-inter text-sm text-navy">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Decorative aquarium */}
+            <div className="relative flex justify-center">
+              <div className="relative w-72">
+                <div className="bg-gradient-to-b from-soft-ice to-mist-blue rounded-3xl aspect-[3/4] border border-mist-blue/30 flex items-end justify-center overflow-hidden">
+                  <div className="w-full h-3/4 bg-gradient-to-t from-mist-blue/60 to-transparent relative">
+                    {/* Plants decoration */}
+                    <div className="absolute bottom-0 left-8 flex gap-1 items-end">
+                      {[30, 50, 40, 60, 35].map((h, i) => (
+                        <div
+                          key={i}
+                          className="bg-gradient-to-t from-green-700 to-green-400 rounded-full opacity-60"
+                          style={{ width: '6px', height: `${h}px`, transform: `rotate(${-5 + i * 3}deg)`, transformOrigin: 'bottom' }}
+                        />
+                      ))}
+                    </div>
+                    {/* Rocks */}
+                    <div className="absolute bottom-0 right-8">
+                      <div className="flex gap-1 items-end">
+                        <div className="w-8 h-6 bg-gray-400 rounded-t-full opacity-50" />
+                        <div className="w-12 h-9 bg-gray-500 rounded-t-full opacity-60" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Plan badge */}
+                <div className="absolute -top-4 -right-4 bg-navy text-white px-4 py-2">
+                  <p className="font-montserrat font-light text-[10px] tracking-widest" style={{ letterSpacing: '0.2em' }}>FROM</p>
+                  <p className="font-montserrat font-light text-2xl">$29<span className="text-sm">/mo</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Plans */}
+      <section className="py-20 px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto">
+
+          {/* Billing toggle */}
+          <div className="flex justify-center mb-12">
+            <div className="flex items-center bg-soft-ice p-1 gap-1">
+              {['monthly', 'yearly'].map(b => (
+                <button
+                  key={b}
+                  onClick={() => setBilling(b)}
+                  className={`font-montserrat text-xs px-5 py-2 transition-all tracking-widest ${billing === b ? 'bg-navy text-white' : 'text-navy'}`}
+                  style={{ letterSpacing: '0.15em' }}
+                >
+                  {b === 'monthly' ? 'MONTHLY' : 'YEARLY (SAVE 20%)'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {plans.map(plan => {
+              const price = billing === 'yearly' ? Math.round(plan.price * 0.8) : plan.price
+              return (
+                <div
+                  key={plan.id}
+                  className={`relative border p-8 ${plan.popular ? 'border-navy' : 'border-gray-100'}`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-px left-1/2 -translate-x-1/2 bg-mist-blue text-navy font-montserrat text-[9px] tracking-widest px-4 py-1.5" style={{ letterSpacing: '0.2em' }}>
+                      MOST POPULAR
+                    </div>
+                  )}
+                  <div className="mb-8">
+                    <h3 className="font-montserrat font-medium text-base text-navy mb-2" style={{ letterSpacing: '0.1em' }}>
+                      {plan.name.toUpperCase()}
+                    </h3>
+                    <p className="font-inter text-sm text-gray-400">{plan.tagline}</p>
+                  </div>
+                  <div className="mb-8">
+                    <span className="font-montserrat font-light text-5xl text-navy">${price}</span>
+                    <span className="font-inter text-sm text-gray-400"> /month</span>
+                    {billing === 'yearly' && (
+                      <p className="font-inter text-xs text-mist-blue mt-1">Billed annually (${price * 12}/yr)</p>
+                    )}
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map(f => (
+                      <li key={f} className="flex items-center gap-3">
+                        <Check size={13} className="text-mist-blue flex-shrink-0" strokeWidth={2} />
+                        <span className="font-inter text-sm text-navy">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    className={`w-full py-3 font-montserrat text-xs tracking-widest transition-all ${plan.popular ? 'bg-navy text-white hover:bg-opacity-90' : 'border border-navy text-navy hover:bg-navy hover:text-white'}`}
+                    style={{ letterSpacing: '0.15em' }}
+                  >
+                    CHOOSE PLAN
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Trust badges */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-16 pt-16 border-t border-gray-100">
+            {[
+              { icon: '↩', title: 'CANCEL ANYTIME', desc: 'No long-term contracts.' },
+              { icon: '◎', title: 'EXPERT SUPPORT', desc: 'We are here for you.' },
+              { icon: '★', title: '100% SATISFACTION', desc: 'Love it or we fix it.' },
+              { icon: '🔒', title: 'SECURE PAYMENT', desc: 'Safe & encrypted.' },
+            ].map(b => (
+              <div key={b.title} className="flex items-start gap-4">
+                <span className="text-mist-blue text-xl">{b.icon}</span>
+                <div>
+                  <p className="font-montserrat font-medium text-[10px] text-navy mb-1" style={{ letterSpacing: '0.15em' }}>{b.title}</p>
+                  <p className="font-inter text-xs text-gray-400">{b.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 bg-soft-ice px-6 lg:px-12">
+        <div className="max-w-3xl mx-auto">
+          <p className="section-label text-center mb-4">HAVE QUESTIONS?</p>
+          <h2 className="font-montserrat font-light text-3xl text-navy text-center mb-12" style={{ letterSpacing: '0.1em' }}>FREQUENTLY ASKED</h2>
+          <div>
+            {faqs.map(faq => (
+              <FaqItem key={faq.q} {...faq} />
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <p className="font-inter text-sm text-gray-400 mb-4">Still have questions?</p>
+            <button className="btn-primary">CONTACT US</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  )
+}
