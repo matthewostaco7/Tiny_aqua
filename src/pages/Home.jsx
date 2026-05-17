@@ -4,56 +4,6 @@ import { useState, useRef } from 'react'
 import { products, categories } from '../data/products'
 import { useCart } from '../context/CartContext'
 
-function HeroVideo() {
-  const [muted, setMuted] = useState(true)
-  const videoRef = useRef(null)
-
-  const toggleMute = () => {
-    setMuted(m => {
-      if (videoRef.current) videoRef.current.muted = !m
-      return !m
-    })
-  }
-
-  return (
-    <div className="relative w-full max-w-sm mx-auto">
-      {/* Soft glow behind */}
-      <div className="absolute inset-4 bg-mist-blue opacity-30 blur-3xl rounded-full" />
-
-      {/* Video container — aquarium-shaped rounded rect */}
-      <div className="relative overflow-hidden rounded-3xl shadow-2xl border border-mist-blue/30 aspect-[4/5]">
-        <video
-          ref={videoRef}
-          src="/hero-betta.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-        />
-        {/* Subtle overlay to blend with brand palette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-navy/20 via-transparent to-transparent pointer-events-none" />
-
-        {/* Mute toggle */}
-        <button
-          onClick={toggleMute}
-          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors"
-        >
-          {muted ? <VolumeX size={13} strokeWidth={1.5} /> : <Volume2 size={13} strokeWidth={1.5} />}
-        </button>
-
-        {/* Brand watermark */}
-        <div className="absolute top-3 left-3">
-          <span className="font-montserrat text-[9px] tracking-widest text-white/60" style={{ letterSpacing: '0.2em' }}>TINY AQUA</span>
-        </div>
-      </div>
-
-      {/* Water reflection */}
-      <div className="relative mt-3 mx-6 h-6 bg-gradient-to-b from-mist-blue/25 to-transparent rounded-b-full blur-sm" />
-    </div>
-  )
-}
-
 function CategoryIcon({ icon, label, id }) {
   return (
     <Link to={`/shop?category=${id}`} className="flex flex-col items-center gap-2 group flex-shrink-0">
@@ -120,59 +70,104 @@ function MiniTank({ category }) {
   )
 }
 
+function HeroSection() {
+  const [muted, setMuted] = useState(true)
+  const videoRef = useRef(null)
+
+  const toggleMute = () => {
+    setMuted(m => {
+      if (videoRef.current) videoRef.current.muted = !m
+      return !m
+    })
+  }
+
+  return (
+    <section className="relative min-h-screen flex items-end overflow-hidden">
+
+      {/* Full-bleed background video */}
+      <video
+        ref={videoRef}
+        src="/hero-betta.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      {/* Gradient overlay — dark at bottom for text legibility, subtle at top */}
+      <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/30 to-transparent pointer-events-none" />
+      {/* Left-side fade so text stays readable */}
+      <div className="absolute inset-0 bg-gradient-to-r from-navy/50 via-transparent to-transparent pointer-events-none" />
+
+      {/* Mute toggle — top right */}
+      <button
+        onClick={toggleMute}
+        className="absolute top-20 right-5 lg:right-10 z-20 w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/25 transition-colors"
+      >
+        {muted ? <VolumeX size={14} strokeWidth={1.5} /> : <Volume2 size={14} strokeWidth={1.5} />}
+      </button>
+
+      {/* Text content — sits over the video */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pb-16 md:pb-24 pt-32">
+        <div className="max-w-lg">
+          <p className="font-montserrat font-medium text-[10px] tracking-widest text-mist-blue mb-4 fade-up fade-up-delay-1" style={{ letterSpacing: '0.3em' }}>
+            SMALL ECOSYSTEMS
+          </p>
+          <h1 className="font-montserrat font-light text-white leading-none mb-4 fade-up fade-up-delay-1" style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '-0.01em' }}>
+            ENDLESS<br />
+            <span className="text-mist-blue">PEACE</span>
+          </h1>
+          <p className="font-inter font-light text-white/70 text-sm md:text-base leading-relaxed mb-8 max-w-xs fade-up fade-up-delay-2">
+            Bring nature into stillness.<br />Premium aquascapes for modern living.
+          </p>
+          <div className="flex flex-wrap gap-3 mb-10 fade-up fade-up-delay-3">
+            <Link to="/shop" className="bg-white text-navy font-montserrat font-medium text-xs tracking-widest px-6 py-3 hover:bg-mist-blue transition-colors" style={{ letterSpacing: '0.15em' }}>
+              SHOP AQUARIUMS →
+            </Link>
+            <Link to="/ecosystems" className="border border-white/60 text-white font-montserrat font-medium text-xs tracking-widest px-6 py-3 hover:bg-white/10 transition-colors" style={{ letterSpacing: '0.15em' }}>
+              BUILD ECOSYSTEM
+            </Link>
+          </div>
+
+          {/* Social proof */}
+          <div className="flex items-center gap-3 fade-up fade-up-delay-4">
+            <div className="flex -space-x-2">
+              {['#B7D6E5', '#EAF4F8', '#0D2742', '#8ba8be'].map((c, i) => (
+                <div key={i} className="w-7 h-7 rounded-full border-2 border-white/40" style={{ background: c }} />
+              ))}
+            </div>
+            <div>
+              <p className="font-montserrat font-medium text-[10px] text-white/90" style={{ letterSpacing: '0.05em' }}>
+                TRUSTED BY <span className="text-mist-blue">10K+</span> CUSTOMERS
+              </p>
+              <div className="flex gap-0.5 mt-0.5">
+                {[...Array(5)].map((_, i) => <span key={i} className="text-yellow-400 text-[10px]">★</span>)}
+                <span className="font-inter text-[10px] text-white/50 ml-1">4.9/5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-50">
+        <div className="w-px h-8 bg-white animate-pulse" />
+        <span className="font-montserrat text-[8px] text-white tracking-widest" style={{ letterSpacing: '0.2em' }}>SCROLL</span>
+      </div>
+
+    </section>
+  )
+}
+
 export default function Home() {
   const featured = products.filter(p => p.featured).slice(0, 4)
 
   return (
     <div className="min-h-screen">
 
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-white via-soft-ice to-white pt-20 pb-12 md:pb-0 md:min-h-[88vh] flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full py-10 md:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-
-            {/* Left */}
-            <div className="order-2 lg:order-1">
-              <p className="section-label mb-3 fade-up fade-up-delay-1">SMALL ECOSYSTEMS</p>
-              <h1 className="font-montserrat font-light leading-none mb-2 fade-up fade-up-delay-1" style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)', letterSpacing: '-0.01em' }}>
-                <span className="text-navy block">ENDLESS</span>
-                <span className="text-mist-blue block">PEACE</span>
-              </h1>
-              <p className="font-inter font-light text-gray-500 text-sm leading-relaxed mt-4 mb-6 max-w-xs fade-up fade-up-delay-2">
-                Bring nature into stillness.<br />Premium aquascapes for modern living.
-              </p>
-              <div className="flex flex-wrap gap-3 fade-up fade-up-delay-3">
-                <Link to="/shop" className="btn-primary">SHOP AQUARIUMS →</Link>
-                <Link to="/ecosystems" className="btn-outline">BUILD ECOSYSTEM</Link>
-              </div>
-
-              {/* Social proof */}
-              <div className="flex items-center gap-3 mt-8 fade-up fade-up-delay-4">
-                <div className="flex -space-x-2">
-                  {['#B7D6E5', '#EAF4F8', '#0D2742', '#8ba8be'].map((c, i) => (
-                    <div key={i} className="w-7 h-7 rounded-full border-2 border-white" style={{ background: c }} />
-                  ))}
-                </div>
-                <div>
-                  <p className="font-montserrat font-medium text-[11px] text-navy">
-                    TRUSTED BY <span className="text-mist-blue">10K+</span> CUSTOMERS
-                  </p>
-                  <div className="flex gap-0.5 mt-0.5">
-                    {[...Array(5)].map((_, i) => <span key={i} className="text-yellow-400 text-[10px]">★</span>)}
-                    <span className="font-inter text-[10px] text-gray-400 ml-1">4.9/5</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right */}
-            <div className="order-1 lg:order-2">
-              <HeroVideo />
-            </div>
-
-          </div>
-        </div>
-      </section>
+      {/* Hero — full bleed video */}
+      <HeroSection />
 
       {/* Categories */}
       <section className="py-8 md:py-10 border-t border-gray-100">
