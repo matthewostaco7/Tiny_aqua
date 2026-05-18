@@ -8,7 +8,7 @@ function MiniTank({ category }) {
     'nano-tanks': { from: '#EAF4F8', to: '#B7D6E5', accent: '#0D2742' },
     'aquascapes': { from: '#e8f5e9', to: '#c8e6c9', accent: '#2e7d32' },
     'plants': { from: '#f1f8e9', to: '#dcedc8', accent: '#558b2f' },
-    'hardscape': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
+    'design': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
     'lighting': { from: '#fff8e1', to: '#fff59d', accent: '#f57f17' },
     'co2-systems': { from: '#e0f7fa', to: '#b2ebf2', accent: '#00838f' },
     'accessories': { from: '#fce4ec', to: '#f8bbd0', accent: '#880e4f' },
@@ -26,7 +26,7 @@ function MiniTank({ category }) {
 export default function Cart() {
   const { items, removeItem, updateQty, subtotal } = useCart()
   const { addItem } = useCart()
-  const shipping = subtotal >= 100 ? 0 : 15
+  const shipping = subtotal >= 3000 ? 0 : 200
   const total = subtotal + shipping
 
   const suggested = products.filter(p => !items.find(i => i.id === p.id)).slice(0, 3)
@@ -84,7 +84,7 @@ export default function Cart() {
                         <Link to={`/product/${item.slug}`}>
                           <h3 className="font-montserrat font-medium text-xs text-navy hover:text-mist-blue transition-colors leading-snug">{item.name}</h3>
                         </Link>
-                        <p className="font-inter text-[10px] text-gray-400 mt-0.5">${item.price.toFixed(2)}</p>
+                        <p className="font-inter text-[10px] text-gray-400 mt-0.5">₱{item.price.toLocaleString()}</p>
                         {/* Mobile: qty inline */}
                         <div className="flex items-center gap-2 mt-2 md:hidden">
                           <div className="flex items-center border border-gray-200">
@@ -92,13 +92,13 @@ export default function Cart() {
                             <span className="w-7 text-center font-inter text-xs text-navy">{item.qty}</span>
                             <button className="w-6 h-6 flex items-center justify-center border-l border-gray-200 text-navy text-sm" onClick={() => updateQty(item.id, item.qty + 1)}>+</button>
                           </div>
-                          <span className="font-montserrat font-medium text-xs text-navy">${(item.price * item.qty).toFixed(2)}</span>
+                          <span className="font-montserrat font-medium text-xs text-navy">₱{(item.price * item.qty).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Price — desktop */}
-                    <div className="hidden md:block md:col-span-2 text-center font-inter text-sm text-navy">${item.price.toFixed(2)}</div>
+                    <div className="hidden md:block md:col-span-2 text-center font-inter text-sm text-navy">₱{item.price.toLocaleString()}</div>
 
                     {/* Qty — desktop */}
                     <div className="hidden md:flex md:col-span-2 justify-center">
@@ -111,7 +111,7 @@ export default function Cart() {
 
                     {/* Total + remove — desktop */}
                     <div className="hidden md:flex md:col-span-2 items-center justify-end gap-3">
-                      <span className="font-montserrat font-medium text-sm text-navy">${(item.price * item.qty).toFixed(2)}</span>
+                      <span className="font-montserrat font-medium text-sm text-navy">₱{(item.price * item.qty).toLocaleString()}</span>
                       <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-navy transition-colors"><X size={13} strokeWidth={1.5} /></button>
                     </div>
 
@@ -143,7 +143,7 @@ export default function Cart() {
                         <h4 className="font-montserrat font-medium text-[10px] text-navy hover:text-mist-blue transition-colors leading-snug">{p.name}</h4>
                       </Link>
                       <div className="flex items-center justify-between mt-1.5">
-                        <span className="font-inter text-[10px] text-navy">${p.price}</span>
+                        <span className="font-inter text-[10px] text-navy">₱{p.price.toLocaleString()}</span>
                         <button onClick={() => addItem({ id: p.id, name: p.name, price: p.price, slug: p.slug })} className="w-6 h-6 border border-gray-200 flex items-center justify-center hover:border-navy hover:bg-navy hover:text-white text-navy transition-all text-xs">+</button>
                       </div>
                     </div>
@@ -161,25 +161,25 @@ export default function Cart() {
               <div className="space-y-3 mb-5">
                 <div className="flex items-center justify-between">
                   <span className="font-inter text-sm text-gray-500">Subtotal</span>
-                  <span className="font-montserrat text-sm text-navy">${subtotal.toFixed(2)}</span>
+                  <span className="font-montserrat text-sm text-navy">₱{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-inter text-sm text-gray-500">Shipping</span>
-                  <span className={`font-montserrat text-sm ${shipping === 0 ? 'text-mist-blue' : 'text-navy'}`}>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                  <span className={`font-montserrat text-sm ${shipping === 0 ? 'text-mist-blue' : 'text-navy'}`}>{shipping === 0 ? 'FREE' : `₱${shipping.toLocaleString()}`}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-inter text-sm text-gray-500">Tax</span>
-                  <span className="font-montserrat text-sm text-navy">$0.00</span>
+                  <span className="font-montserrat text-sm text-navy">₱0</span>
                 </div>
               </div>
 
               <div className="border-t border-gray-200 pt-4 mb-6">
                 <div className="flex items-center justify-between">
                   <span className="font-montserrat font-medium text-sm text-navy" style={{ letterSpacing: '0.08em' }}>TOTAL</span>
-                  <span className="font-montserrat font-medium text-xl text-navy">${total.toFixed(2)}</span>
+                  <span className="font-montserrat font-medium text-xl text-navy">₱{total.toLocaleString()}</span>
                 </div>
-                {subtotal < 100 && <p className="font-inter text-[10px] text-gray-400 mt-1.5">Add ${(100 - subtotal).toFixed(2)} more for free shipping</p>}
-                <p className="font-inter text-[10px] text-mist-blue mt-1.5">4 interest-free payments of ${(total / 4).toFixed(2)} with Shop Pay</p>
+                {subtotal < 3000 && <p className="font-inter text-[10px] text-gray-400 mt-1.5">Add ₱{(3000 - subtotal).toLocaleString()} more for free shipping</p>}
+                <p className="font-inter text-[10px] text-mist-blue mt-1.5">4 interest-free payments of ₱{Math.ceil(total / 4).toLocaleString()} with Shop Pay</p>
               </div>
 
               <button className="btn-primary w-full text-center mb-4">CHECKOUT →</button>
@@ -187,7 +187,7 @@ export default function Cart() {
               {/* Trust badges */}
               <div className="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-gray-200">
                 {[
-                  { Icon: Truck, label: 'FREE SHIP', sub: 'Over $100' },
+                  { Icon: Truck, label: 'FREE SHIP', sub: 'Over ₱3,000' },
                   { Icon: RotateCcw, label: '30-DAY', sub: 'Returns' },
                   { Icon: Shield, label: 'SECURE', sub: 'Payment' },
                 ].map(({ Icon, label, sub }) => (

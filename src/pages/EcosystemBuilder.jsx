@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { ChevronRight, Check } from 'lucide-react'
+import { ChevronRight, Check, Plus, Minus } from 'lucide-react'
 import { products, ecosystemSteps, livestock as livestockData } from '../data/products'
 import { useCart } from '../context/CartContext'
 import { useNavigate } from 'react-router-dom'
 
 const tanks = products.filter(p => p.category === 'nano-tanks')
-const hardscapeItems = products.filter(p => p.category === 'hardscape')
+const designItems = products.filter(p => p.category === 'design')
 const plantItems = products.filter(p => p.category === 'plants')
 const equipmentItems = products.filter(p => ['lighting', 'co2-systems', 'accessories'].includes(p.category)).slice(0, 4)
 
@@ -44,9 +44,9 @@ function TankCard({ tank, selected, onSelect }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-montserrat font-medium text-xs text-navy">{tank.name}</p>
-          <p className="font-inter text-[10px] text-gray-400">{tank.specs?.volume || tank.size}</p>
+          <p className="font-inter text-[10px] text-gray-400">{tank.specs?.dimensions} · {tank.specs?.volume || tank.size}</p>
         </div>
-        <p className="font-montserrat font-medium text-sm text-navy flex-shrink-0">${tank.price}</p>
+        <p className="font-montserrat font-medium text-sm text-navy flex-shrink-0">₱{tank.price.toLocaleString()}</p>
       </div>
     </button>
   )
@@ -64,22 +64,35 @@ function ItemCard({ item, selected, onToggle }) {
       </div>
       <h4 className="font-montserrat font-medium text-[10px] text-navy leading-snug">{item.name}</h4>
       <p className="font-inter text-[9px] text-gray-400 mt-0.5 mb-1.5 line-clamp-1">{item.tagline}</p>
-      <p className="font-montserrat text-xs text-navy">${item.price}</p>
+      <p className="font-montserrat text-xs text-navy">₱{item.price.toLocaleString()}</p>
     </div>
   )
 }
 
-function LivestockCard({ animal, selected, onToggle }) {
+function LivestockCard({ animal, qty, onAdd, onRemove }) {
   return (
-    <div onClick={() => onToggle(animal)} className={`border p-3 cursor-pointer transition-all ${selected ? 'border-navy bg-soft-ice' : 'border-gray-100 hover:border-mist-blue'}`}>
-      <div className="flex items-start justify-between gap-2">
+    <div className={`border p-3 transition-all ${qty > 0 ? 'border-navy bg-soft-ice' : 'border-gray-100'}`}>
+      <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
           <h4 className="font-montserrat font-medium text-xs text-navy">{animal.name}</h4>
-          <p className="font-inter text-[10px] text-gray-400 mt-1 leading-snug">{animal.description}</p>
-          <p className="font-montserrat text-xs text-navy mt-2">${animal.price}</p>
+          <p className="font-inter text-[10px] text-gray-400 mt-0.5 leading-snug">{animal.description}</p>
+          <p className="font-montserrat text-xs text-navy mt-1.5">₱{animal.pricePerUnit}/pc</p>
         </div>
-        <div className={`w-5 h-5 border-2 flex items-center justify-center flex-shrink-0 ${selected ? 'border-navy bg-navy' : 'border-gray-200'}`}>
-          {selected && <Check size={10} className="text-white" strokeWidth={2} />}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <button
+            onClick={onRemove}
+            disabled={qty === 0}
+            className={`w-7 h-7 border flex items-center justify-center transition-colors ${qty > 0 ? 'border-navy text-navy hover:bg-navy hover:text-white' : 'border-gray-200 text-gray-300 cursor-not-allowed'}`}
+          >
+            <Minus size={11} strokeWidth={2} />
+          </button>
+          <span className="w-6 text-center font-inter text-sm text-navy">{qty}</span>
+          <button
+            onClick={onAdd}
+            className="w-7 h-7 border border-navy text-navy flex items-center justify-center hover:bg-navy hover:text-white transition-colors"
+          >
+            <Plus size={11} strokeWidth={2} />
+          </button>
         </div>
       </div>
     </div>
@@ -89,9 +102,9 @@ function LivestockCard({ animal, selected, onToggle }) {
 export default function EcosystemBuilder() {
   const [step, setStep] = useState(0)
   const [selectedTank, setSelectedTank] = useState(null)
-  const [selectedHardscape, setSelectedHardscape] = useState([])
+  const [selectedDesign, setSelectedDesign] = useState([])
   const [selectedPlants, setSelectedPlants] = useState([])
-  const [selectedLivestock, setSelectedLivestock] = useState([])
+  const [livestockQty, setLivestockQty] = useState({})
   const [selectedEquipment, setSelectedEquipment] = useState([])
   const [selectedCarePlan, setSelectedCarePlan] = useState(null)
   const { addItem } = useCart()
@@ -100,19 +113,43 @@ export default function EcosystemBuilder() {
   const toggle = (arr, setArr, item) =>
     setArr(arr.find(i => i.id === item.id) ? arr.filter(i => i.id !== item.id) : [...arr, item])
 
-  const ecosystemItems = [...(selectedTank ? [selectedTank] : []), ...selectedHardscape, ...selectedPlants, ...selectedLivestock, ...selectedEquipment]
-  const total = ecosystemItems.reduce((s, i) => s + i.price, 0)
+  const getLQty = id => livestockQty[id] || 0
+  const adjustLQty = (id, delta) => {
+    const newQty = Math.max(0, getLQty(id) + delta)
+    setLivestockQty(prev => {
+      if (newQty === 0) {
+        const { [id]: _, ...rest } = prev
+        return rest
+      }
+      return { ...prev, [id]: newQty }
+    })
+  }
+
+  const selectedLivestockItems = livestockData.filter(a => getLQty(a.id) > 0)
+
+  const ecosystemProductItems = [
+    ...(selectedTank ? [selectedTank] : []),
+    ...selectedDesign,
+    ...selectedPlants,
+    ...selectedEquipment,
+  ]
+
+  const livestockTotal = selectedLivestockItems.reduce((s, a) => s + a.pricePerUnit * getLQty(a.id), 0)
+  const total = ecosystemProductItems.reduce((s, i) => s + i.price, 0) + livestockTotal
 
   const handleAddAll = () => {
-    ecosystemItems.forEach(item => addItem({ id: item.id, name: item.name, price: item.price, slug: item.slug || item.id }))
+    ecosystemProductItems.forEach(item => addItem({ id: item.id, name: item.name, price: item.price, slug: item.slug || item.id }))
+    selectedLivestockItems.forEach(a => addItem({ id: a.id, name: a.name, price: a.pricePerUnit, slug: a.id }, getLQty(a.id)))
     navigate('/cart')
   }
 
   const carePlans = [
-    { id: 'essential', name: 'Essential Care', price: 29, features: ['Water change (bi/month)', 'Plant trimming', 'Water testing'] },
-    { id: 'nature', name: 'Nature Care', price: 59, features: ['Water change (4x/month)', 'Plant trimming', 'CO2 refill', 'Fertilisation'] },
-    { id: 'elite', name: 'Elite Ecosystem', price: 99, features: ['Unlimited maintenance', 'Emergency support', 'Monthly ecosystem check'] },
+    { id: 'essential', name: 'Essential Care', price: 1500, features: ['Water change (bi/month)', 'Plant trimming', 'Water testing'] },
+    { id: 'nature', name: 'Nature Care', price: 3000, features: ['Water change (4x/month)', 'Plant trimming', 'CO2 refill', 'Fertilisation'] },
+    { id: 'elite', name: 'Elite Ecosystem', price: 5000, features: ['Unlimited maintenance', 'Emergency support', 'Monthly ecosystem check'] },
   ]
+
+  const allItemCount = ecosystemProductItems.length + selectedLivestockItems.reduce((s, a) => s + getLQty(a.id), 0)
 
   const stepContent = [
     <div key="tank">
@@ -123,11 +160,11 @@ export default function EcosystemBuilder() {
       </div>
     </div>,
 
-    <div key="hardscape">
-      <h2 className="font-montserrat font-light text-lg md:text-xl text-navy mb-1" style={{ letterSpacing: '0.08em' }}>CHOOSE HARDSCAPE</h2>
+    <div key="design">
+      <h2 className="font-montserrat font-light text-lg md:text-xl text-navy mb-1" style={{ letterSpacing: '0.08em' }}>CHOOSE DESIGN</h2>
       <p className="font-inter text-sm text-gray-400 mb-5">Stones and driftwood shape your scape.</p>
       <div className="grid grid-cols-2 gap-3">
-        {hardscapeItems.map(item => <ItemCard key={item.id} item={item} selected={selectedHardscape.some(i => i.id === item.id)} onToggle={i => toggle(selectedHardscape, setSelectedHardscape, i)} />)}
+        {designItems.map(item => <ItemCard key={item.id} item={item} selected={selectedDesign.some(i => i.id === item.id)} onToggle={i => toggle(selectedDesign, setSelectedDesign, i)} />)}
       </div>
     </div>,
 
@@ -141,9 +178,17 @@ export default function EcosystemBuilder() {
 
     <div key="livestock">
       <h2 className="font-montserrat font-light text-lg md:text-xl text-navy mb-1" style={{ letterSpacing: '0.08em' }}>ADD LIVESTOCK</h2>
-      <p className="font-inter text-sm text-gray-400 mb-5">Fish and shrimp for your ecosystem.</p>
+      <p className="font-inter text-sm text-gray-400 mb-5">Choose fish and shrimp — set how many you want.</p>
       <div className="space-y-2">
-        {livestockData.map(a => <LivestockCard key={a.id} animal={a} selected={selectedLivestock.some(i => i.id === a.id)} onToggle={i => toggle(selectedLivestock, setSelectedLivestock, i)} />)}
+        {livestockData.map(a => (
+          <LivestockCard
+            key={a.id}
+            animal={a}
+            qty={getLQty(a.id)}
+            onAdd={() => adjustLQty(a.id, 1)}
+            onRemove={() => adjustLQty(a.id, -1)}
+          />
+        ))}
       </div>
     </div>,
 
@@ -167,7 +212,7 @@ export default function EcosystemBuilder() {
                 <ul className="space-y-1">{plan.features.map(f => <li key={f} className="flex items-center gap-1.5 font-inter text-xs text-gray-500"><span className="text-mist-blue text-[10px]">✓</span>{f}</li>)}</ul>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="font-montserrat font-light text-xl text-navy">${plan.price}</p>
+                <p className="font-montserrat font-light text-xl text-navy">₱{plan.price.toLocaleString()}</p>
                 <p className="font-inter text-[10px] text-gray-400">/mo</p>
               </div>
             </div>
@@ -182,7 +227,7 @@ export default function EcosystemBuilder() {
     <div key="summary">
       <h2 className="font-montserrat font-light text-lg md:text-xl text-navy mb-1" style={{ letterSpacing: '0.08em' }}>YOUR ECOSYSTEM</h2>
       <p className="font-inter text-sm text-gray-400 mb-5">Review before adding to cart.</p>
-      {ecosystemItems.length === 0 ? (
+      {ecosystemProductItems.length === 0 && selectedLivestockItems.length === 0 ? (
         <div className="text-center py-10 border border-gray-100">
           <p className="font-inter text-sm text-gray-400">No items selected yet.</p>
           <button onClick={() => setStep(0)} className="mt-3 font-montserrat text-xs text-navy border-b border-navy">START OVER</button>
@@ -190,22 +235,28 @@ export default function EcosystemBuilder() {
       ) : (
         <div>
           <div className="space-y-2.5 mb-5">
-            {ecosystemItems.map((item, i) => (
+            {ecosystemProductItems.map((item, i) => (
               <div key={i} className="flex items-center justify-between py-2.5 border-b border-gray-100">
                 <p className="font-inter text-sm text-navy">{item.name}</p>
-                <p className="font-montserrat text-sm text-navy">${item.price}</p>
+                <p className="font-montserrat text-sm text-navy">₱{item.price.toLocaleString()}</p>
+              </div>
+            ))}
+            {selectedLivestockItems.map(a => (
+              <div key={a.id} className="flex items-center justify-between py-2.5 border-b border-gray-100">
+                <p className="font-inter text-sm text-navy">{a.name} <span className="text-gray-400 text-xs">× {getLQty(a.id)}</span></p>
+                <p className="font-montserrat text-sm text-navy">₱{(a.pricePerUnit * getLQty(a.id)).toLocaleString()}</p>
               </div>
             ))}
             {selectedCarePlan && (
               <div className="flex items-center justify-between py-2.5 border-b border-gray-100">
                 <p className="font-inter text-sm text-navy">{selectedCarePlan.name} <span className="text-gray-400 text-xs">(subscription)</span></p>
-                <p className="font-montserrat text-sm text-navy">${selectedCarePlan.price}/mo</p>
+                <p className="font-montserrat text-sm text-navy">₱{selectedCarePlan.price.toLocaleString()}/mo</p>
               </div>
             )}
           </div>
           <div className="flex items-center justify-between pt-3 border-t border-gray-200 mb-6">
             <p className="font-montserrat font-medium text-xs text-navy" style={{ letterSpacing: '0.08em' }}>TOTAL</p>
-            <p className="font-montserrat font-medium text-xl text-navy">${total.toFixed(2)}</p>
+            <p className="font-montserrat font-medium text-xl text-navy">₱{total.toLocaleString()}</p>
           </div>
           <button onClick={handleAddAll} className="btn-primary w-full text-center">ADD ECOSYSTEM TO CART →</button>
         </div>
@@ -255,13 +306,13 @@ export default function EcosystemBuilder() {
                 {selectedTank ? (
                   <svg viewBox="0 0 200 160" fill="none" className="w-4/5 h-4/5">
                     <rect x="15" y="20" width="170" height="120" rx="12" fill="#EAF4F8" stroke="#0D2742" strokeWidth="2" opacity="0.9" />
-                    {selectedHardscape.length > 0 && <ellipse cx="100" cy="138" rx="30" ry="8" fill="#8d7b6b" opacity="0.4" />}
+                    {selectedDesign.length > 0 && <ellipse cx="100" cy="138" rx="30" ry="8" fill="#8d7b6b" opacity="0.4" />}
                     {selectedPlants.length > 0 && <>
                       <rect x="35" y="95" width="8" height="30" rx="4" fill="#4caf50" opacity="0.5" transform="rotate(-5 35 125)" />
                       <rect x="48" y="85" width="6" height="40" rx="3" fill="#66bb6a" opacity="0.6" transform="rotate(3 48 125)" />
                     </>}
                     <path d="M15 90 C45 75, 80 105, 110 88 C140 72, 165 95, 185 85 L185 140 Q185 140 177 140 L23 140 Q15 140 15 140 Z" fill="#B7D6E5" opacity="0.5" />
-                    {selectedLivestock.length > 0 && <ellipse cx="80" cy="85" rx="8" ry="4" fill="#ef5350" opacity="0.6" transform="rotate(-15 80 85)" />}
+                    {selectedLivestockItems.length > 0 && <ellipse cx="80" cy="85" rx="8" ry="4" fill="#ef5350" opacity="0.6" transform="rotate(-15 80 85)" />}
                   </svg>
                 ) : (
                   <div className="text-center">
@@ -274,23 +325,29 @@ export default function EcosystemBuilder() {
               </div>
 
               {/* Items */}
-              <div className="space-y-1.5 mb-4 max-h-36 overflow-y-auto">
-                {ecosystemItems.map((item, i) => (
+              <div className="space-y-1.5 mb-4 max-h-40 overflow-y-auto">
+                {ecosystemProductItems.map((item, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <p className="font-inter text-[10px] text-gray-500 truncate">{item.name}</p>
-                    <p className="font-montserrat text-[10px] text-navy ml-2 flex-shrink-0">${item.price}</p>
+                    <p className="font-montserrat text-[10px] text-navy ml-2 flex-shrink-0">₱{item.price.toLocaleString()}</p>
                   </div>
                 ))}
-                {ecosystemItems.length === 0 && <p className="font-inter text-[10px] text-gray-300 text-center py-2">No items yet</p>}
+                {selectedLivestockItems.map(a => (
+                  <div key={a.id} className="flex items-center justify-between">
+                    <p className="font-inter text-[10px] text-gray-500 truncate">{a.name} ×{getLQty(a.id)}</p>
+                    <p className="font-montserrat text-[10px] text-navy ml-2 flex-shrink-0">₱{(a.pricePerUnit * getLQty(a.id)).toLocaleString()}</p>
+                  </div>
+                ))}
+                {allItemCount === 0 && <p className="font-inter text-[10px] text-gray-300 text-center py-2">No items yet</p>}
               </div>
 
               {/* Total */}
               <div className="flex items-center justify-between border-t border-gray-200 pt-3">
-                <span className="font-montserrat text-[9px] text-navy" style={{ letterSpacing: '0.1em' }}>{ecosystemItems.length} ITEM{ecosystemItems.length !== 1 ? 'S' : ''}</span>
+                <span className="font-montserrat text-[9px] text-navy" style={{ letterSpacing: '0.1em' }}>{allItemCount} ITEM{allItemCount !== 1 ? 'S' : ''}</span>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
                     <p className="font-inter text-[8px] text-gray-400">TOTAL</p>
-                    <p className="font-montserrat font-medium text-base text-navy">${total.toFixed(2)}</p>
+                    <p className="font-montserrat font-medium text-base text-navy">₱{total.toLocaleString()}</p>
                   </div>
                   {step < ecosystemSteps.length - 1 ? (
                     <button onClick={() => setStep(s => s + 1)} className="btn-primary py-1.5 text-[9px] whitespace-nowrap">NEXT →</button>

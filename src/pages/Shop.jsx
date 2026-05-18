@@ -9,7 +9,7 @@ function MiniTank({ category }) {
     'nano-tanks': { from: '#EAF4F8', to: '#B7D6E5', accent: '#0D2742' },
     'aquascapes': { from: '#e8f5e9', to: '#c8e6c9', accent: '#2e7d32' },
     'plants': { from: '#f1f8e9', to: '#dcedc8', accent: '#558b2f' },
-    'hardscape': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
+    'design': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
     'lighting': { from: '#fff8e1', to: '#fff59d', accent: '#f57f17' },
     'co2-systems': { from: '#e0f7fa', to: '#b2ebf2', accent: '#00838f' },
     'accessories': { from: '#fce4ec', to: '#f8bbd0', accent: '#880e4f' },
@@ -29,7 +29,7 @@ export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [viewMode, setViewMode] = useState('grid')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [priceRange, setPriceRange] = useState(1000)
+  const [priceRange, setPriceRange] = useState(30000)
   const [sortBy, setSortBy] = useState('featured')
   const { addItem } = useCart()
 
@@ -148,7 +148,7 @@ export default function Shop() {
                       <Link to={`/product/${product.slug}`}>
                         <h3 className="font-montserrat font-medium text-xs text-navy hover:text-mist-blue transition-colors leading-snug">{product.name}</h3>
                       </Link>
-                      <p className="font-inter text-xs text-navy mt-1">${product.price.toFixed(2)}</p>
+                      <p className="font-inter text-xs text-navy mt-1">₱{product.price.toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
@@ -171,7 +171,7 @@ export default function Shop() {
                           </Link>
                           <p className="font-inter text-xs text-gray-400 mt-0.5 truncate">{product.tagline}</p>
                         </div>
-                        <p className="font-montserrat font-medium text-sm text-navy flex-shrink-0">${product.price}</p>
+                        <p className="font-montserrat font-medium text-sm text-navy flex-shrink-0">₱{product.price.toLocaleString()}</p>
                       </div>
                       <div className="flex items-center gap-3 mt-3">
                         <button onClick={() => addItem({ id: product.id, name: product.name, price: product.price, slug: product.slug })} className="btn-primary py-1.5 text-[9px]">ADD TO CART</button>
@@ -218,10 +218,10 @@ function FilterContent({ activeCategory, setCategory, priceRange, setPriceRange,
 
       <div>
         <h3 className="font-montserrat font-medium text-[9px] tracking-widest text-navy mb-3" style={{ letterSpacing: '0.2em' }}>PRICE</h3>
-        <input type="range" min={0} max={1000} value={priceRange} onChange={e => setPriceRange(Number(e.target.value))} className="w-full mb-2" />
+        <input type="range" min={0} max={30000} value={priceRange} onChange={e => setPriceRange(Number(e.target.value))} className="w-full mb-2" />
         <div className="flex justify-between">
-          <span className="font-inter text-xs text-gray-400">$0</span>
-          <span className="font-inter text-xs text-navy">${priceRange}</span>
+          <span className="font-inter text-xs text-gray-400">₱0</span>
+          <span className="font-inter text-xs text-navy">₱{priceRange.toLocaleString()}</span>
         </div>
       </div>
 
@@ -234,7 +234,7 @@ function FilterContent({ activeCategory, setCategory, priceRange, setPriceRange,
         </div>
       </div>
 
-      <button onClick={() => { setCategory(''); setPriceRange(1000) }} className="font-montserrat text-[9px] tracking-widest text-gray-400 hover:text-navy transition-colors" style={{ letterSpacing: '0.15em' }}>
+      <button onClick={() => { setCategory(''); setPriceRange(30000) }} className="font-montserrat text-[9px] tracking-widest text-gray-400 hover:text-navy transition-colors" style={{ letterSpacing: '0.15em' }}>
         CLEAR FILTERS
       </button>
     </div>

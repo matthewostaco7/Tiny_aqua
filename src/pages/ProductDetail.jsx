@@ -9,7 +9,7 @@ function MiniTank({ category }) {
     'nano-tanks': { from: '#EAF4F8', to: '#B7D6E5', accent: '#0D2742' },
     'aquascapes': { from: '#e8f5e9', to: '#c8e6c9', accent: '#2e7d32' },
     'plants': { from: '#f1f8e9', to: '#dcedc8', accent: '#558b2f' },
-    'hardscape': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
+    'design': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
     'lighting': { from: '#fff8e1', to: '#fff59d', accent: '#f57f17' },
     'co2-systems': { from: '#e0f7fa', to: '#b2ebf2', accent: '#00838f' },
     'accessories': { from: '#fce4ec', to: '#f8bbd0', accent: '#880e4f' },
@@ -132,8 +132,8 @@ export default function ProductDetail() {
 
             {/* Price */}
             <div className="flex items-center gap-3 mb-6">
-              <span className="font-montserrat font-light text-2xl md:text-3xl text-navy">${product.price.toFixed(2)}</span>
-              {product.originalPrice && <span className="font-inter text-sm text-gray-300 line-through">${product.originalPrice}</span>}
+              <span className="font-montserrat font-light text-2xl md:text-3xl text-navy">₱{product.price.toLocaleString()}</span>
+              {product.originalPrice && <span className="font-inter text-sm text-gray-300 line-through">₱{product.originalPrice.toLocaleString()}</span>}
             </div>
 
             {/* Qty + Add */}
@@ -186,7 +186,7 @@ export default function ProductDetail() {
                 </ul>
               </Accordion>
               <Accordion title="SHIPPING & RETURNS">
-                <p>Free shipping on orders over $100. Standard delivery 3–5 business days.</p>
+                <p>Free shipping on orders over ₱3,000. Standard delivery 3–5 business days.</p>
                 <p className="mt-2">30-day returns on all unused items.</p>
               </Accordion>
             </div>
@@ -214,7 +214,7 @@ export default function ProductDetail() {
                   <div className="p-3 flex items-center justify-between">
                     <div>
                       <Link to={`/product/${p.slug}`}><h3 className="font-montserrat font-medium text-xs text-navy hover:text-mist-blue transition-colors">{p.name}</h3></Link>
-                      <p className="font-inter text-xs text-navy mt-0.5">${p.price}</p>
+                      <p className="font-inter text-xs text-navy mt-0.5">₱{p.price.toLocaleString()}</p>
                     </div>
                     <button onClick={() => addItem({ id: p.id, name: p.name, price: p.price, slug: p.slug })} className="w-7 h-7 border border-gray-200 flex items-center justify-center hover:border-navy hover:bg-navy hover:text-white text-navy transition-all text-sm">+</button>
                   </div>

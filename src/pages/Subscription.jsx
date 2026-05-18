@@ -4,17 +4,17 @@ import { Link } from 'react-router-dom'
 
 const plans = [
   {
-    id: 'essential', name: 'Essential Care', price: 29, popular: false,
+    id: 'essential', name: 'Essential Care', price: 1500, popular: false,
     tagline: 'Basic maintenance for healthy ecosystems.',
     features: ['Water change (bi/month)', 'Plant trimming', 'Water testing', 'Online support'],
   },
   {
-    id: 'nature', name: 'Nature Care', price: 59, popular: true,
+    id: 'nature', name: 'Nature Care', price: 3000, popular: true,
     tagline: 'Complete care for thriving aquascapes.',
     features: ['Water change (4x/month)', 'Plant trimming', 'Water testing', 'CO2 refill', 'Fertilisation', 'Priority support'],
   },
   {
-    id: 'elite', name: 'Elite Ecosystem', price: 99, popular: false,
+    id: 'elite', name: 'Elite Ecosystem', price: 5000, popular: false,
     tagline: 'Premium care for elite ecosystems.',
     features: ['Unlimited maintenance', 'CO2 & fertilizer included', 'Emergency support', 'Monthly ecosystem check', 'Personal aquascaper'],
   },
@@ -56,7 +56,7 @@ export default function Subscription() {
                 WE TAKE CARE<br />OF YOUR ECOSYSTEM
               </h1>
               <p className="font-inter text-gray-500 text-sm leading-relaxed mb-6 max-w-xs">
-                Professional aquacare so you can enjoy the peace. Starting at $29/month.
+                Professional aquacare so you can enjoy the peace. Starting at ₱1,500/month.
               </p>
               <ul className="space-y-2.5 mb-8">
                 {['Professional maintenance', 'Healthy plants & fish', 'Crystal clear water', 'Priority support'].map(f => (
@@ -90,7 +90,7 @@ export default function Subscription() {
                 </div>
                 <div className="absolute -top-3 -right-3 bg-navy text-white px-3 py-1.5">
                   <p className="font-montserrat font-light text-[9px] tracking-widest" style={{ letterSpacing: '0.18em' }}>FROM</p>
-                  <p className="font-montserrat font-light text-xl">$29<span className="text-xs">/mo</span></p>
+                  <p className="font-montserrat font-light text-xl">₱1,500<span className="text-xs">/mo</span></p>
                 </div>
               </div>
             </div>
@@ -126,9 +126,9 @@ export default function Subscription() {
                     <p className="font-inter text-xs text-gray-400">{plan.tagline}</p>
                   </div>
                   <div className="mb-5">
-                    <span className="font-montserrat font-light text-4xl text-navy">${price}</span>
+                    <span className="font-montserrat font-light text-4xl text-navy">₱{price.toLocaleString()}</span>
                     <span className="font-inter text-xs text-gray-400"> /month</span>
-                    {billing === 'yearly' && <p className="font-inter text-[10px] text-mist-blue mt-0.5">Billed annually (${price * 12}/yr)</p>}
+                    {billing === 'yearly' && <p className="font-inter text-[10px] text-mist-blue mt-0.5">Billed annually (₱{(price * 12).toLocaleString()}/yr)</p>}
                   </div>
                   <ul className="space-y-2.5 mb-6">
                     {plan.features.map(f => (

@@ -43,7 +43,7 @@ function ProductCard({ product }) {
         <Link to={`/product/${product.slug}`}>
           <h3 className="font-montserrat font-medium text-xs text-navy hover:text-mist-blue transition-colors leading-snug">{product.name}</h3>
         </Link>
-        <p className="font-inter text-xs text-navy mt-1">${product.price.toFixed(2)}</p>
+        <p className="font-inter text-xs text-navy mt-1">₱{product.price.toLocaleString()}</p>
       </div>
     </div>
   )
@@ -54,7 +54,7 @@ function MiniTank({ category }) {
     'nano-tanks': { from: '#EAF4F8', to: '#B7D6E5', accent: '#0D2742' },
     'aquascapes': { from: '#e8f5e9', to: '#c8e6c9', accent: '#2e7d32' },
     'plants': { from: '#f1f8e9', to: '#dcedc8', accent: '#558b2f' },
-    'hardscape': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
+    'design': { from: '#fafafa', to: '#eceff1', accent: '#607d8b' },
     'lighting': { from: '#fff8e1', to: '#fff59d', accent: '#f57f17' },
     'co2-systems': { from: '#e0f7fa', to: '#b2ebf2', accent: '#00838f' },
     'accessories': { from: '#fce4ec', to: '#f8bbd0', accent: '#880e4f' },
@@ -208,10 +208,10 @@ export default function Home() {
                 BUILD YOUR PERFECT WORLD
               </h2>
               <p className="font-inter text-gray-500 text-sm leading-relaxed mb-6 max-w-xs">
-                Choose your tank, hardscape, plants, and livestock. Our guided builder creates a living ecosystem that thrives.
+                Choose your tank, design, plants, and livestock. Our guided builder creates a living ecosystem that thrives.
               </p>
               <div className="flex items-center gap-2 mb-6 flex-wrap">
-                {['Tank', 'Hardscape', 'Plants', 'Livestock', 'Equipment'].map((step, i) => (
+                {['Tank', 'Design', 'Plants', 'Livestock', 'Equipment'].map((step, i) => (
                   <div key={step} className="flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded-full border border-navy flex items-center justify-center">
                       <span className="font-montserrat text-[8px] text-navy">{i + 1}</span>
@@ -225,8 +225,8 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'Choose Tank', icon: '🪟', desc: '4 sizes available' },
-                { label: 'Add Hardscape', icon: '🪨', desc: 'Stone & driftwood' },
+                { label: 'Choose Tank', icon: '🪟', desc: '5 sizes available' },
+                { label: 'Add Design', icon: '🪨', desc: 'Stone & driftwood' },
                 { label: 'Plant it', icon: '🌿', desc: '30+ species' },
                 { label: 'Add Life', icon: '🐟', desc: 'Curated livestock' },
               ].map((s, i) => (
@@ -251,7 +251,7 @@ export default function Home() {
                 WE TAKE CARE OF YOUR ECOSYSTEM
               </h2>
               <p className="font-inter text-gray-400 text-sm leading-relaxed mb-5 max-w-xs">
-                Professional maintenance, healthy plants & fish, crystal clear water — from $29/month.
+                Professional maintenance, healthy plants & fish, crystal clear water — from ₱1,500/month.
               </p>
               <ul className="space-y-2 mb-6">
                 {['Professional maintenance', 'Healthy plants & fish', 'Crystal clear water', 'Priority support'].map(f => (
@@ -267,14 +267,14 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { name: 'Essential', price: 29, popular: false },
-                { name: 'Nature Care', price: 59, popular: true },
-                { name: 'Elite', price: 99, popular: false },
+                { name: 'Essential', price: 1500, popular: false },
+                { name: 'Nature Care', price: 3000, popular: true },
+                { name: 'Elite', price: 5000, popular: false },
               ].map(plan => (
                 <div key={plan.name} className={`p-4 border text-center ${plan.popular ? 'border-mist-blue bg-white/5' : 'border-white/20'}`}>
                   {plan.popular && <p className="font-montserrat text-[7px] text-mist-blue tracking-widest mb-1" style={{ letterSpacing: '0.15em' }}>POPULAR</p>}
                   <h4 className="font-montserrat font-light text-[9px] text-white mb-2 leading-snug" style={{ letterSpacing: '0.08em' }}>{plan.name.toUpperCase()}</h4>
-                  <p className="font-montserrat font-light text-2xl text-white">${plan.price}<span className="text-xs text-gray-400 font-inter">/mo</span></p>
+                  <p className="font-montserrat font-light text-2xl text-white">₱{plan.price.toLocaleString()}<span className="text-xs text-gray-400 font-inter">/mo</span></p>
                 </div>
               ))}
             </div>
