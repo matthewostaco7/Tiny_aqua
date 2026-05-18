@@ -9,6 +9,134 @@ const designItems = products.filter(p => p.category === 'design')
 const plantItems = products.filter(p => p.category === 'plants')
 const equipmentItems = products.filter(p => ['lighting', 'co2-systems', 'accessories'].includes(p.category)).slice(0, 4)
 
+const parseCm = spec => parseInt((spec || '').split('×')[0].trim()) || 30
+
+/* Realistic rimless glass cube SVG — matches the product photo */
+function TankCubeSVG({ className = '' }) {
+  return (
+    <svg viewBox="0 0 220 205" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      {/* Drop shadow */}
+      <ellipse cx="113" cy="199" rx="82" ry="6" fill="rgba(0,0,0,0.06)" />
+
+      {/* Left side panel — parallelogram */}
+      <polygon
+        points="16,50 60,12 60,184 16,222"
+        fill="rgba(185,238,235,0.18)"
+        stroke="#7ECECE"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+
+      {/* Bottom panel */}
+      <polygon
+        points="16,222 60,184 202,184 158,222"
+        fill="rgba(185,238,235,0.15)"
+        stroke="#7ECECE"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+
+      {/* Front glass panel — main face */}
+      <rect
+        x="60" y="12" width="142" height="172"
+        fill="rgba(235,250,250,0.08)"
+        stroke="#7ECECE"
+        strokeWidth="2.8"
+      />
+
+      {/* Interior back wall — very subtle white fill */}
+      <rect x="65" y="17" width="132" height="162" fill="rgba(255,255,255,0.20)" />
+
+      {/* Interior floor reflection */}
+      <rect x="65" y="158" width="132" height="21" fill="rgba(180,235,232,0.22)" />
+
+      {/* Left edge bright highlight */}
+      <line x1="60" y1="13" x2="60" y2="184" stroke="rgba(255,255,255,0.55)" strokeWidth="1.3" />
+
+      {/* Top open rim — teal edge */}
+      <line x1="60" y1="12" x2="202" y2="12" stroke="#7ECECE" strokeWidth="3" strokeLinecap="round" />
+      <line x1="16" y1="50" x2="60" y2="12" stroke="#7ECECE" strokeWidth="2.2" strokeLinecap="round" />
+
+      {/* Right back top edge */}
+      <line x1="202" y1="12" x2="158" y2="50" stroke="#7ECECE" strokeWidth="1.6" strokeLinecap="round" opacity="0.5" />
+
+      {/* Subtle glass surface light reflection — top left of front */}
+      <polygon points="68,18 105,18 92,38 68,32" fill="rgba(255,255,255,0.07)" />
+
+      {/* Tiny Aqua logo — bottom right of front face */}
+      {/* Fish/whale pill icon */}
+      <rect x="163" y="167" width="22" height="11" rx="5.5"
+        fill="none" stroke="rgba(126,206,206,0.65)" strokeWidth="1.2" />
+      <ellipse cx="169" cy="172.5" rx="2" ry="1.8" fill="rgba(126,206,206,0.5)" />
+      {/* Logo text */}
+      <text
+        x="152" y="184"
+        fontSize="6" fill="rgba(126,206,206,0.7)"
+        fontFamily="'Montserrat', sans-serif"
+        fontWeight="500"
+        letterSpacing="1.2"
+      >TINY AQUA</text>
+    </svg>
+  )
+}
+
+function SizeComparison({ tanks, selectedTank, onSelect }) {
+  const BASE_H = 136
+  const MAX_CM = 40
+
+  return (
+    <div className="bg-soft-ice border border-gray-100 py-5 px-4 mb-6">
+      <p className="font-montserrat text-[8px] tracking-widest text-gray-400 mb-5 text-center" style={{ letterSpacing: '0.22em' }}>
+        SIZE COMPARISON
+      </p>
+
+      {/* Tanks lined up by size, bottom-aligned */}
+      <div className="flex items-end justify-center gap-2 md:gap-4 mb-3">
+        {tanks.map(tank => {
+          const cm = parseCm(tank.specs.dimensions)
+          const h = Math.round((cm / MAX_CM) * BASE_H)
+          const w = Math.round(h * 1.12)
+          const isSelected = selectedTank?.id === tank.id
+
+          return (
+            <button
+              key={tank.id}
+              onClick={() => onSelect(tank)}
+              className="flex flex-col items-center gap-1 transition-all focus:outline-none"
+            >
+              {/* Tank image scaled proportionally */}
+              <div
+                className={`transition-all duration-200 ${isSelected ? 'drop-shadow-md' : 'opacity-55 hover:opacity-80'}`}
+                style={{ width: w, height: h }}
+              >
+                <TankCubeSVG className="w-full h-full" />
+              </div>
+
+              {/* Selection dot */}
+              <div className={`w-1.5 h-1.5 rounded-full mt-1 transition-all ${isSelected ? 'bg-navy' : 'bg-transparent'}`} />
+
+              {/* Labels */}
+              <p className={`font-montserrat text-[8px] leading-none transition-colors ${isSelected ? 'text-navy font-semibold' : 'text-gray-400'}`} style={{ letterSpacing: '0.08em' }}>
+                {cm}cm
+              </p>
+              <p className={`font-inter text-[9px] leading-none ${isSelected ? 'text-navy' : 'text-gray-300'}`}>
+                {tank.specs?.volume}
+              </p>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Baseline ruler */}
+      <div className="flex items-center gap-1 justify-center mt-1">
+        <div className="h-px flex-1 max-w-[260px] bg-gray-200" />
+        <span className="font-inter text-[8px] text-gray-300 px-1">scale 1:1</span>
+        <div className="h-px flex-1 max-w-[260px] bg-gray-200" />
+      </div>
+    </div>
+  )
+}
+
 function StepIndicator({ steps, current }) {
   return (
     <div className="flex items-center overflow-x-auto pb-1">
@@ -36,15 +164,14 @@ function TankCard({ tank, selected, onSelect }) {
         <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selected ? 'border-navy' : 'border-gray-300'}`}>
           {selected && <div className="w-2 h-2 rounded-full bg-navy" />}
         </div>
-        <div className={`w-11 h-11 flex-shrink-0 bg-gradient-to-br ${tank.gradient} flex items-center justify-center`}>
-          <svg viewBox="0 0 50 40" fill="none" className="w-9 h-7">
-            <rect x="3" y="4" width="44" height="32" rx="5" fill="#EAF4F8" stroke="#0D2742" strokeWidth="1.5" opacity="0.8" />
-            <path d="M3 24 C13 18, 24 28, 32 22 C40 16, 45 24, 47 22 L47 36 Q47 36 45 36 L5 36 Q3 36 3 36 Z" fill="#B7D6E5" opacity="0.6" />
-          </svg>
+        {/* Tank SVG scaled per cm */}
+        <div className="flex-shrink-0 flex items-end justify-center" style={{ width: 52, height: 52 }}>
+          <TankCubeSVG className="w-full h-full" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-montserrat font-medium text-xs text-navy">{tank.name}</p>
-          <p className="font-inter text-[10px] text-gray-400">{tank.specs?.dimensions} · {tank.specs?.volume || tank.size}</p>
+          <p className="font-inter text-[10px] text-gray-400">{tank.specs?.dimensions}</p>
+          <p className="font-inter text-[10px] text-gray-400">{tank.specs?.volume} · {tank.specs?.glass}</p>
         </div>
         <p className="font-montserrat font-medium text-sm text-navy flex-shrink-0">₱{tank.price.toLocaleString()}</p>
       </div>
@@ -126,14 +253,12 @@ export default function EcosystemBuilder() {
   }
 
   const selectedLivestockItems = livestockData.filter(a => getLQty(a.id) > 0)
-
   const ecosystemProductItems = [
     ...(selectedTank ? [selectedTank] : []),
     ...selectedDesign,
     ...selectedPlants,
     ...selectedEquipment,
   ]
-
   const livestockTotal = selectedLivestockItems.reduce((s, a) => s + a.pricePerUnit * getLQty(a.id), 0)
   const total = ecosystemProductItems.reduce((s, i) => s + i.price, 0) + livestockTotal
 
@@ -154,7 +279,12 @@ export default function EcosystemBuilder() {
   const stepContent = [
     <div key="tank">
       <h2 className="font-montserrat font-light text-lg md:text-xl text-navy mb-1" style={{ letterSpacing: '0.08em' }}>CHOOSE YOUR TANK</h2>
-      <p className="font-inter text-sm text-gray-400 mb-5">Select the perfect tank for your ecosystem.</p>
+      <p className="font-inter text-sm text-gray-400 mb-5">Select the perfect size for your space.</p>
+
+      {/* Visual size comparison */}
+      <SizeComparison tanks={tanks} selectedTank={selectedTank} onSelect={setSelectedTank} />
+
+      {/* Detailed selection list */}
       <div className="space-y-2">
         {tanks.map(t => <TankCard key={t.id} tank={t} selected={selectedTank?.id === t.id} onSelect={setSelectedTank} />)}
       </div>
@@ -304,16 +434,24 @@ export default function EcosystemBuilder() {
               {/* Preview */}
               <div className="bg-white aspect-square flex items-center justify-center mb-4 border border-gray-100">
                 {selectedTank ? (
-                  <svg viewBox="0 0 200 160" fill="none" className="w-4/5 h-4/5">
-                    <rect x="15" y="20" width="170" height="120" rx="12" fill="#EAF4F8" stroke="#0D2742" strokeWidth="2" opacity="0.9" />
-                    {selectedDesign.length > 0 && <ellipse cx="100" cy="138" rx="30" ry="8" fill="#8d7b6b" opacity="0.4" />}
-                    {selectedPlants.length > 0 && <>
-                      <rect x="35" y="95" width="8" height="30" rx="4" fill="#4caf50" opacity="0.5" transform="rotate(-5 35 125)" />
-                      <rect x="48" y="85" width="6" height="40" rx="3" fill="#66bb6a" opacity="0.6" transform="rotate(3 48 125)" />
-                    </>}
-                    <path d="M15 90 C45 75, 80 105, 110 88 C140 72, 165 95, 185 85 L185 140 Q185 140 177 140 L23 140 Q15 140 15 140 Z" fill="#B7D6E5" opacity="0.5" />
-                    {selectedLivestockItems.length > 0 && <ellipse cx="80" cy="85" rx="8" ry="4" fill="#ef5350" opacity="0.6" transform="rotate(-15 80 85)" />}
-                  </svg>
+                  <div className="w-4/5 h-4/5 flex flex-col items-center justify-end">
+                    {/* Tank preview with plants/livestock overlay */}
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <TankCubeSVG className="w-full h-full" />
+                      {selectedPlants.length > 0 && (
+                        <div className="absolute bottom-[22%] left-[32%] flex gap-0.5 items-end">
+                          <div className="w-1.5 h-5 bg-green-500 rounded-full opacity-60" style={{ transform: 'rotate(-5deg)' }} />
+                          <div className="w-1 h-7 bg-green-400 rounded-full opacity-70" style={{ transform: 'rotate(3deg)' }} />
+                          <div className="w-1.5 h-4 bg-green-600 rounded-full opacity-60" style={{ transform: 'rotate(2deg)' }} />
+                        </div>
+                      )}
+                      {selectedLivestockItems.length > 0 && (
+                        <div className="absolute" style={{ bottom: '32%', left: '52%' }}>
+                          <div className="w-3 h-1.5 bg-red-400 rounded-full opacity-70" style={{ transform: 'rotate(-10deg)' }} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-center">
                     <div className="w-10 h-10 rounded-full border border-dashed border-mist-blue flex items-center justify-center mx-auto mb-2">
